@@ -29,6 +29,7 @@ Today, i will design a secure system to defense invalid requests, in order to im
 * A task for sending email will be execute every minutes, which fetchs the top counting data in redis
 
 ## The Spout and Bolts in Apacha Storm
+
 There are one spout and five bolts
 
 * The Spout will use kafka to send log info
@@ -39,6 +40,7 @@ There are one spout and five bolts
 * The Third Counting Bolt, named CIpCounter, will counting the num of requests per statusCode by using redis
 
 ## The Data Structure in Redis
+
 SortedSet and simple key-value pair will be used, A group of nums per ip will be in a sorted set, and the other num will just store in key-value pairs.
 Below are the name definition of every sortedset and key-value pairs, time format is '201607241239', every key must be expired in two minutes
 
