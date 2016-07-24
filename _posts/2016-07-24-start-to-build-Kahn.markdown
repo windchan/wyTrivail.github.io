@@ -3,15 +3,17 @@ layout: post
 title: "Start to build Kahn"
 categories: jekyll update
 ---
-Today, i will design a secure system to defense invalid requests, in order to improve the stability of our web system.
+Hey man, let's design a secure system to defense invalid requests, for improving the stability of our web system.
 
-## what components i will use
+## The Components i will use
+
 * Apache Storm, i will use storm to calculate the realtime log info from kafka
 * Redis, the result calculated will be stored in redis temporarily
 * Crontab, the system will send a alarm email and ban the suspicious ips based on the data of redis every minute
 * Nodejs, there will be a dashboard to display the real-time data
 
-## what data in redis do i need for banning ip
+## The Data in Redis do i need for Banning IP
+
 * the num of requests per ip in one minute
 * the num of requests per ip-and-url in one minute
 * the num of requests per ip-and-statusCode in one minute
@@ -24,6 +26,7 @@ Today, i will design a secure system to defense invalid requests, in order to im
 * the num of requests per status in one minutes
 
 ## the whole flow
+
 * Firstly, the log from kafka will be split into ip, host, url, these hosts in whitelist and static request will be ignore
 * Secondly, ip, host, url and statusCode will be counting in redis
 * A task for sending email will be execute every minutes, which fetchs the top counting data in redis
@@ -45,12 +48,30 @@ SortedSet and simple key-value pair will be used, A group of nums per ip will be
 Below are the name definition of every sortedset and key-value pairs, time format is '201607241239', every key must be expired in two minutes
 
 * the num of requests per ip in one minute, the sorted set's name: `sorted-set-for-ip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per ip-and-url in one minute, the key-value pair's key name: `ip-url-%ip%-%url%-%date%`
-* the num of requests per ip-and-statusCode in one minute, the key-value pair's key name: `ip-status-%ip%-%status%-%date%`
+* the num of requests per ip-and-url in one minute, the key-value pair's key name: `ip-url-%ip%-%date%-%url%`
+* the num of requests per ip-and-statusCode in one minute, the key-value pair's key name: `ip-status-%ip%-%date%-%status%`
 * the num of requests per class B of ip in one minute, the sorted set'name: `sorted-set-for-bip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per class B of ip-and-url in one minute, the key-value pair's key name: `bip-url-%the class B of ip%-%url%-%date%`
-* the num of requests per class B of ip-and-statusCode in one minute, the key-value pair's key name: `bip-status-%the class B of ip%-%status%-%date%`
+* the num of requests per class B of ip-and-url in one minute, the key-value pair's key name: `bip-url-%the class B of ip%-%date%-%url%`
+* the num of requests per class B of ip-and-statusCode in one minute, the key-value pair's key name: `bip-status-%the class B of ip%-%date%-%status%`
 * the num of requests per class C of ip in one minute, the sorted set'name: `sorted-set-for-cip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per class C of ip-and-url in one minute, the key-value pair's key name: `cip-url-%the class C of ip%-%url%-%date%`
-* the num of requests per class C of ip-and-statusCode in one minute, the key-value pair's key name: `cip-status-%the class C of ip%-%status%-%date%`
-* the num of requests per status in one hours, the key-value pair's key name: `count-status-%status%-%date%`
+* the num of requests per class C of ip-and-url in one minute, the key-value pair's key name: `cip-url-%the class C of ip%-%date%-%url%`
+* the num of requests per class C of ip-and-statusCode in one minute, the key-value pair's key name: `cip-status-%the class C of ip%-%date%-%status%`
+* the num of requests per status in one minutes, the sorted set's name: `sorted-set-for-status-counting-%date%`, the key in set: `%status%`
+
+## The Cronjob
+
+A task will be execute every minute, which config in linux system by using the cmd: crontab.
+In order to get the complate data in every minute, The task will be execute after ten seconds for every minute, for example, the task will be execute in 10:01:10, 10:02:10
+The task will do the things below:
+
+* Firstly, the task fetchs the top ten data from redis sorted set
+* Then, the task will fetch the ip-url, ip-status's data of the top ten ip in redis, by using redis cmd/function: KEYS
+* And the next, rendering a html text and send email
+* Finally, ban the ips!(it is no need to do so in the early stage because we need analysis the data)
+
+
+## Tips
+
+* use fieldsGrouping
+* use sortedset in Redis
+* filter the useless requests
