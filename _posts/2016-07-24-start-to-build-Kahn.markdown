@@ -30,6 +30,7 @@ Today, i will design a secure system to defense invalid requests, in order to im
 
 ## The Spout and Bolts in Apacha Storm
 There are one spout and five bolts
+
 * The Spout will use kafka to send log info
 * The First Bolt, named LogProcessor, will split the log info, filter the useless requests, then send the ip info to the counting bolts, which use fieldsGrouping
 * The First Counting Bolt, named IpCounter, will counting the num of ip, ip-and-url, ip-and-statusCode by using edis 
@@ -40,6 +41,7 @@ There are one spout and five bolts
 ## The Data Structure in Redis
 SortedSet and simple key-value pair will be used, A group of nums per ip will be in a sorted set, and the other num will just store in key-value pairs.
 Below are the name definition of every sortedset and key-value pairs, time format is '201607241239', every key must be expired in two minutes
+
 * the num of requests per ip in one minute, the sorted set'name: 'sorted-set-for-ip-counting-%date%', the key in sorted set: '%ip%'
 * the num of requests per ip-and-url in one minute, the key-value pair's key name: 'ip-url-%ip%-%url%-%date%'
 * the num of requests per ip-and-statusCode in one minute, the key-value pair's key name: 'ip-status-%ip%-%status%-%date%'
