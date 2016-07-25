@@ -51,11 +51,11 @@ Below are the name definition of every sortedset, time format is '201607241239',
 * the num of requests per ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%ip%-%date%`, the key in sorted set: `%url%`
 * the num of requests per ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%ip%-%date%`, the key in sorted set: `%statusCode%`
 * the num of requests per class B of ip in one minute, the sorted set'name: `sorted-set-for-bip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per class B of ip-and-url in one minute, the key-value pair's key name: `bip-url-%the class B of ip%-%date%-%url%`
-* the num of requests per class B of ip-and-statusCode in one minute, the key-value pair's key name: `bip-status-%the class B of ip%-%date%-%status%`
+* the num of requests per class B of ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%the class B of ip%-%date%`, the key in sorted set: `%url%`
+* the num of requests per class B of ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%the class B of ip%-%date%`, the key in sorted set: `%statusCode%`
 * the num of requests per class C of ip in one minute, the sorted set'name: `sorted-set-for-cip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per class C of ip-and-url in one minute, the key-value pair's key name: `cip-url-%the class C of ip%-%date%-%url%`
-* the num of requests per class C of ip-and-statusCode in one minute, the key-value pair's key name: `cip-status-%the class C of ip%-%date%-%status%`
+* the num of requests per class C of ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%the class C of ip%-%date%`, the key in sorted set: `%url%`
+* the num of requests per class C of ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%the class C of ip%-%date%`, the key in sorted set: `%statusCode%`
 * the num of requests per status in one minutes, the sorted set's name: `sorted-set-for-status-counting-%date%`, the key in set: `%status%`
 
 ## The Cronjob
