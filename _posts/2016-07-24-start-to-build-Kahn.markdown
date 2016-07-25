@@ -44,12 +44,12 @@ There are one spout and five bolts
 
 ## The Data Structure in Redis
 
-SortedSet and simple key-value pair will be used, A group of nums per ip will be in a sorted set, and the other num will just store in key-value pairs.
-Below are the name definition of every sortedset and key-value pairs, time format is '201607241239', every key must be expired in two minutes
+SortedSet will be used, A group of nums per ip will be in a sorted set.
+Below are the name definition of every sortedset, time format is '201607241239', every key must be expired in two minutes
 
 * the num of requests per ip in one minute, the sorted set's name: `sorted-set-for-ip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per ip-and-url in one minute, the key-value pair's key name: `ip-url-%ip%-%date%-%url%`
-* the num of requests per ip-and-statusCode in one minute, the key-value pair's key name: `ip-status-%ip%-%date%-%status%`
+* the num of requests per ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%ip%-%date%`, the key in sorted set: `%url%`
+* the num of requests per ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%ip%-%date%`, the key in sorted set: `%statusCode%`
 * the num of requests per class B of ip in one minute, the sorted set'name: `sorted-set-for-bip-counting-%date%`, the key in sorted set: `%ip%`
 * the num of requests per class B of ip-and-url in one minute, the key-value pair's key name: `bip-url-%the class B of ip%-%date%-%url%`
 * the num of requests per class B of ip-and-statusCode in one minute, the key-value pair's key name: `bip-status-%the class B of ip%-%date%-%status%`
