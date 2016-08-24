@@ -3,75 +3,84 @@ layout: post
 title: "Start to build Kahn"
 categories: jekyll update
 ---
-Hey man, let's design a secure system to defense invalid requests, for improving the stability of our web system.
+Hey man! Let's design a security system to filter out anomalous IPs to improve the stability of Kuaizhan!
 
-## The Components i will use
+## The components I will use are listed below:
 
-* Apache Storm, i will use storm to calculate the realtime log info from kafka
-* Redis, the result calculated will be stored in redis temporarily
-* Crontab, the system will send a alarm email and ban the suspicious ips based on the data of redis every minute
-* Nodejs, there will be a dashboard to display the real-time data
+* Apache Storm: I will use storm to process the real-time log from Kafka
+* Redis: Suspicious IPs, URLs, and Requests will be stored in Redis
+* Crontab: Every minute, it will ban all the suspicious IPs and send an alarm email after analyzing statistics stored in Redis
+* Node.js: There will be a dashboard to display the real-time data
+
 
 ## The Data in Redis do i need for Banning IP
 
-* the num of requests per ip in one minute
-* the num of requests per ip-and-url in one minute
-* the num of requests per ip-and-statusCode in one minute
-* the num of requests per class B of ip in one minute
-* the num of requests per class B of ip-and-url in one minute
-* the num of requests per class B of ip-and-statusCode in one minute
-* the num of requests per class C of ip in one minute
-* the num of requests per class C of ip-and-url in one minute
-* the num of requests per class C of ip-and-statusCode in one minute
-* the num of requests per status in one minutes
+* Number of requests per IP in one minute
+* Number of requests per IP and URL in one minute
+* Number of requests per IP and Status Code in one minute
+* Number of requests per class B IP in one minute
+* Number of requests per class B IP and URL in one minute
+* Number of requests per class B IP and Status Code in one minute
+* Number of requests per class C IP in one minute
+* Number of requests per class C IP and URL in one minute
+* Number of requests per class C IP and Status Code in one minute
+* Number of requests per Status Code in one minutes
 
-## the whole flow
+## How does Kahn work?
 
-* Firstly, the log from kafka will be split into ip, host, url, these hosts in whitelist and static request will be ignore
-* Secondly, ip, host, url and statusCode will be counting in redis
-* A task for sending email will be execute every minutes, which fetchs the top counting data in redis
+* Firstly, a Kafka reader spout will read the log from Kafka queue. Each log entry will be made into a tuple that contains IP, host, URL, Status Code, Class B IP, Class C IP, Log Time, and local machine's System Time. Static requests and requests from hosts that are in the whitelist will be ignored.
+* Secondly, the bolts taking tuples from the spout will count the number of occurences of each IP, URL, and Status Code and store them in Redis.
+* Eventually, a task will fetch IP, URLs, and Status Codes with the most count and send alarm emails every minute.
 
 ## The Spout and Bolts in Apacha Storm
 
-There are one spout and five bolts
+There are one spout and five bolts:
 
-* The Spout will use kafka to send log info
-* The First Bolt, named LogProcessor, will split the log info, filter the useless requests, then send the ip info to the counting bolts, which use fieldsGrouping
-* The First Counting Bolt, named IpCounter, will counting the num of ip, ip-and-url, ip-and-statusCode by using edis 
-* The Second Counting Bolt, named BIpCounter, will counting the num of requests , per class B of ip, class B of ip-and-url, class B of ip-and-statusCode by using redis
-* The Second Counting Bolt, named CIpCounter, will counting the num of requests, per class C of ip, class C of ip-and-url, class C of ip-and-statusCode by using redis
-* The Third Counting Bolt, named CIpCounter, will counting the num of requests per statusCode by using redis
+* The Spout will read from Kafka queuee and send information to the first bolt ... 
+* The 1st Bolt, named LogProcessor, will extract information susch as IP and host and send the information to the counting bolts that connect to it through FieldsGrouping. Requests allowed in the whitelist will not be counted.
+* The 1st Counting Bolt, named IpCounter, will increment the count of IP, IP and URL, IP and Status Code in Redis.
+* The 2nd Counting Bolt, named HostCounter, will increment the count of each host.
+* The 3rd Counting Bolt, named StatusCounter, will increment the count of each Status Code.
+* The 4th Counting Bolt, named UrlCounter, will increment the count of each URL.
+* [Deprecated] Counting Bolt named RequestsCounter will count the total number of requests.
+* [Deprecated] Counting Bolt named SubsysCounter will count the number of requests of each sub system.
+* [Deprecated] Counting Bolt named BIpCounter will increment the count of Class B IP, Class B IP and URL, Class B IP and Status Code in Redis.
+* [Deprecated] Counting Bolt named CIpCounter will increment the count of Class C IP, Class C IP and URL, Class C IP and Status Code in Redis.
 
 ## The Data Structure in Redis
 
-SortedSet will be used, A group of nums per ip will be in a sorted set.
-Below are the name definition of every sortedset, time format is '201607241239', every key must be expired in two minutes
+We use Sorted Set to count the number of requests for each field.
+Time Format is 'YYYYMMddmmSS'. eg. '201607241239'
+Every key expires in 10 minutes.
 
-* the num of requests per ip in one minute, the sorted set's name: `sorted-set-for-ip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%ip%-%date%`, the key in sorted set: `%url%`
-* the num of requests per ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%ip%-%date%`, the key in sorted set: `%statusCode%`
-* the num of requests per class B of ip in one minute, the sorted set'name: `sorted-set-for-bip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per class B of ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%the class B of ip%-%date%`, the key in sorted set: `%url%`
-* the num of requests per class B of ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%the class B of ip%-%date%`, the key in sorted set: `%statusCode%`
-* the num of requests per class C of ip in one minute, the sorted set'name: `sorted-set-for-cip-counting-%date%`, the key in sorted set: `%ip%`
-* the num of requests per class C of ip-and-url in one minute, the sorted set's name: `sorted-set-for-url-counting-%the class C of ip%-%date%`, the key in sorted set: `%url%`
-* the num of requests per class C of ip-and-statusCode in one minute, the sorted set's name: `sorted-set-for-status-counting-%the class C of ip%-%date%`, the key in sorted set: `%statusCode%`
-* the num of requests per status in one minutes, the sorted set's name: `sorted-set-for-status-counting-%date%`, the key in set: `%status%`
+Below are the structures of every sorted set:
+
+* Number of requests per IP in one minute. Named of the sorted set is `sorted-set-for-ip-counting-%date%`. The key in the sorted set is `%ip%`
+* Number of requests per IP and URL in one minute. Named of the sorted set is `sorted-set-for-url-counting-%ip%-%date%`. The key in the sorted set is `%url%`
+* Number of requests per IP and Status Code in one minute. Named of the sorted set is `sorted-set-for-status-counting-%ip%-%date%`. The key in the sorted set is `%statusCode%`
+* Number of requests per class B IP in one minute. Named of the sorted set is `sorted-set-for-bip-counting-%date%`. The key in the sorted set is `%ip%`
+* Number of requests per Status Code in one minutes. Named of the sorted set is `sorted-set-for-status-counting-%date%`. The key in the sorted set is `%status%`
+* Number of requests per class B IP and URL in one minute. Named of the sorted set is `sorted-set-for-url-counting-%the class B of ip%-%date%`. The key in the sorted set is `%url%`
+* Number of requests per class B IP and Status Code in one minute. Named of the sorted set is `sorted-set-for-status-counting-%the class B of ip%-%date%`. The key in the sorted set is `%statusCode%`
+* Number of requests per class C IP in one minute. Named of the sorted set is `sorted-set-for-cip-counting-%date%`. The key in the sorted set is `%ip%`
+* Number of requests per class C IP and URL in one minute. Named of the sorted set is `sorted-set-for-url-counting-%the class C of ip%-%date%`. The key in the sorted set is `%url%`
+* Number of requests per class C IP and Status Code in one minute. Named of the sorted set is `sorted-set-for-status-counting-%the class C of ip%-%date%`. The key in the sorted set is `%statusCode%`
 
 ## The Cronjob
 
-A task will be execute every minute, which config in linux system by using the cmd: crontab.
-In order to get the complate data in every minute, The task will be execute after ten seconds for every minute, for example, the task will be execute in 10:01:10, 10:02:10
-The task will do the things below:
+A Python script will be executed every minute by using the command crontab.
+In order to have complete data in the previous minute, the script will be executed 10 seconds after every minute ends. For example, the script will be executed at 10:01:10, 10:02:10
 
-* Firstly, the task fetchs the top ten data from redis sorted set
-* Then, the task will fetch the ip-url, ip-status's data of the top ten ip in redis, by using redis cmd/function: KEYS
-* And the next, rendering a html text and send email
-* Finally, ban the ips!(it is no need to do so in the early stage because we need analysis the data)
+The script does the following tasks:
+
+* Firstly, it fetches top 10 results from IP's sorted set.
+* Secondly, it fetches top 10 results from IP-URL and IP-Status Code sorted set.
+* Thirdly, organize the information and send the alarm email.
+* Finally, it bans the IPs by talking to nginx.
 
 
 ## Tips
 
-* use fieldsGrouping
-* use sortedset in Redis
-* filter the useless requests
+* Use FieldGrouping feature in Storm
+* Use Sorted Set in Redis
+* Ignore requests that are allowed by the whitelist
