@@ -49,11 +49,11 @@ There are one spout and five bolts:
 
 ## The Data Structure in Redis
 
-We use Sorted Set to count the number of requests for each field.
-Time Format is 'YYYYMMddmmSS'. eg. '201607241239'
-Every key expires in 10 minutes.
+We use Sorted Set to count the number of requests for each field.  
+Time Format is 'YYYYMMddmmSS'. eg. '201607241239'  
+Every key expires in 10 minutes.  
 
-Below are the structures of every sorted set:
+Below are the structures of every sorted set:  
 
 * Number of requests per IP in one minute. Named of the sorted set is `sorted-set-for-ip-counting-%date%`. The key in the sorted set is `%ip%`
 * Number of requests per IP and URL in one minute. Named of the sorted set is `sorted-set-for-url-counting-%ip%-%date%`. The key in the sorted set is `%url%`
@@ -68,10 +68,10 @@ Below are the structures of every sorted set:
 
 ## The Cronjob
 
-A Python script will be executed every minute by using the command crontab.
-In order to have complete data in the previous minute, the script will be executed 10 seconds after every minute ends. For example, the script will be executed at 10:01:10, 10:02:10
+A Python script will be executed every minute by using the command crontab.   
+In order to have complete data in the previous minute, the script will be executed 10 seconds after every minute ends. For example, the script will be executed at 10:01:10, 10:02:10  
 
-The script does the following tasks:
+The script does the following tasks:  
 
 * Firstly, it fetches top 10 results from IP's sorted set.
 * Secondly, it fetches top 10 results from IP-URL and IP-Status Code sorted set.
@@ -83,4 +83,4 @@ The script does the following tasks:
 
 * Use FieldGrouping feature in Storm
 * Use Sorted Set in Redis
-* Ignore requests that are allowed by the whitelist
+* Ignore requests that are allowed in the whitelist
