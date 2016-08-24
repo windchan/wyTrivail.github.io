@@ -13,7 +13,7 @@ Hey man! Let's design a security system to filter out anomalous IPs to improve t
 * Node.js: There will be a dashboard to display the real-time data
 
 
-## The Data in Redis do i need for Banning IP
+## Data Entries in Redis that I need for banning IPs
 
 * Number of requests per IP in one minute
 * Number of requests per IP and URL in one minute
