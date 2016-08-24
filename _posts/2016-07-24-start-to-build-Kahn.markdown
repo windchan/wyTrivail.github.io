@@ -3,7 +3,7 @@ layout: post
 title: "Start to build Kahn"
 categories: jekyll update
 ---
-Hey man! Let's design a security system to filter out anomalous IPs to improve the stability of Kuaizhan!
+Hey man! Let's design a security system to ban anomalous IPs and improve the stability of Kuaizhan!
 
 ## The components I will use are listed below:
 
