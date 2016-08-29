@@ -66,6 +66,17 @@ Below are the structures of every sorted set:
 * Number of requests per class C IP and URL in one minute. Named of the sorted set is `sorted-set-for-url-counting-%the class C of ip%-%date%`. The key in the sorted set is `%url%`
 * Number of requests per class C IP and Status Code in one minute. Named of the sorted set is `sorted-set-for-status-counting-%the class C of ip%-%date%`. The key in the sorted set is `%statusCode%`
 
+
+## 4 Topologies
+Due to limited processing power of the Storm Cluster, Kahn is broken up into 4 topologies, each dedicating itself to separate tasks.   
+Each topology has its own LogProcessor Bolt.  
+
+* Topology 1 includes IPCounter, StatusCounter, and URLCounter
+* Topology 2 includes hostCounter
+* Topology 3 includes Class B IPCounter and Class C IPCounter
+* Topology 4 includes Sub System Counter
+
+
 ## The Cronjob
 
 A Python script will be executed every minute by using the command crontab.   
