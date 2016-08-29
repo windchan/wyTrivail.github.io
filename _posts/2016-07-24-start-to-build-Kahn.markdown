@@ -42,10 +42,10 @@ There are one spout and five bolts:
 * The 2nd Counting Bolt, named HostCounter, will increment the count of each host.
 * The 3rd Counting Bolt, named StatusCounter, will increment the count of each Status Code.
 * The 4th Counting Bolt, named UrlCounter, will increment the count of each URL.
-* The 5th Counting Bolt named RequestsCounter will count the total number of requests.
-* The 6th Counting Bolt named SubsysCounter will count the number of requests of each sub system.
-* The 7th Counting Bolt named BIpCounter will increment the count of Class B IP, Class B IP and URL, Class B IP and Status Code in Redis.
-* The 8th Counting Bolt named CIpCounter will increment the count of Class C IP, Class C IP and URL, Class C IP and Status Code in Redis.
+* The 5th Counting Bolt, named RequestsCounter, will count the total number of requests.
+* The 6th Counting Bolt, named SubsysCounter, will count the number of requests of each sub system.
+* The 7th Counting Bolt, named BIpCounter, will increment the count of Class B IP, Class B IP and URL, Class B IP and Status Code in Redis.
+* The 8th Counting Bolt, named CIpCounter, will increment the count of Class C IP, Class C IP and URL, Class C IP and Status Code in Redis.
 
 ## The Data Structure in Redis
 
