@@ -68,7 +68,7 @@ Below are the structures of every sorted set:
 
 
 ## 4 Topologies
-Due to limited processing power of the Storm Cluster, Kahn is broken up into 4 topologies, each dedicating itself to separate tasks.   
+Due to limited processing power of the Storm Cluster, Kahn is broken into 4 topologies, each dedicating itself to separate tasks.   
 Each topology has its own LogProcessor Bolt.  
 
 * Topology 1 includes IPCounter, StatusCounter, and URLCounter
